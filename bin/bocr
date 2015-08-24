@@ -1,0 +1,25 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+import sys
+from os import getenv
+from os.path import join, abspath
+
+from baiduocr import BaiduOcr
+
+if __name__ == '__main__':
+    if len(sys.argv) != 2:
+        print 'Usage: %s <picture>' % sys.argv[0]
+        sys.exit(1)
+
+    try:
+        api_key = open('~/.bocr_key').read().strip()
+        ocr = BaiduOcr(apikey=api_key)
+    except IOError as e:
+        print 'No API key found in %s' % abspath(join(getenv('HOME'), '.bocr_key'))
+        sys.exit(1)
+
+    res = ocr.recog(sys.argv[1])
+    print res.get(u'retData')[0].get(u'word')
+    # except Exception as e:
+        # print e
+

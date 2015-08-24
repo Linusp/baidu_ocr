@@ -1,0 +1,8 @@
+* BaiduOcr
+
+** Installation
+
+   This project is still under development, so you should install it via GitHub instead of PyPI:
+   #+BEGIN_SRC sh
+   pip install git+https://github.com/Linusp/baidu_ocr.git
+   #+END_SRC
