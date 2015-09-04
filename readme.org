@@ -128,8 +128,8 @@
      -i INPUT, --input INPUT
                            specify picture want to recognize
      -s SERVICE, --service SERVICE
-                           choose service from LocateRecognize(0), Locate(1),
-                           Recognize(2, default), SingleCharRecognize(3)
+                           choose service from LocateRecognize(0), Recognize(1,
+                           default), Locate(2), SingleCharRecognize(3)
      -l LANG, --lang LANG  specify language of text to be detected,
                            chn_eng(default) or eng
      -t TYPE, --type TYPE  set the api type, online or test(default)

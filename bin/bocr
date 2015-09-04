@@ -24,7 +24,7 @@ if __name__ == '__main__':
     parser.add_argument('-i', '--input', type=str,
                         help='specify picture want to recognize')
     parser.add_argument('-s', '--service', type=int,
-                        help='choose service from LocateRecognize(0), Locate(1), Recognize(2, default), SingleCharRecognize(3)')
+                        help='choose service from LocateRecognize(0), Recognize(1, default), Locate(2), SingleCharRecognize(3)')
     parser.add_argument('-l', '--lang', type=str,
                         help='specify language of text to be detected, chn_eng(default), eng, jap or kor')
     parser.add_argument('-t', '--type', type=str,
