@@ -1,25 +1,86 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import sys
+import argparse
 from os import getenv
 from os.path import join, abspath
+from operator import itemgetter
 
 from baiduocr import BaiduOcr
 
+
+KEY_FILE = join(getenv('HOME'), '.bocr_key')
+
+SERVICE_LIST = {
+    0: 'LocateRecognize',
+    1: 'Recognize',
+    2: 'Locate',
+    3: 'SingleCharRecognize',
+}
+
+
 if __name__ == '__main__':
-    if len(sys.argv) != 2:
-        print 'Usage: %s <picture>' % sys.argv[0]
+    parser = argparse.ArgumentParser(description='Recognize text from picuture.')
+    parser.add_argument('-i', '--input', type=str,
+                        help='specify picture want to recognize')
+    parser.add_argument('-s', '--service', type=int,
+                        help='choose service from LocateRecognize(0), Locate(1), Recognize(2, default), SingleCharRecognize(3)')
+    parser.add_argument('-l', '--lang', type=str,
+                        help='specify language of text to be detected, chn_eng(default), eng, jap or kor')
+    parser.add_argument('-t', '--type', type=str,
+                        help='set the api type, online or test(default)')
+
+    args = parser.parse_args()
+
+    image_file = args.input
+    service = SERVICE_LIST.get(1 if not args.service else args.service, None)
+    lang = 'chn_eng' if not args.lang else args.lang
+    api_type = 'test' if not args.type else args.type
+
+    # 参数检查
+    if not image_file:
+        print 'no image file is given.'
+        parser.print_help()
+        sys.exit(1)
+
+    if not service:
+        print 'invalid service'
+        parser.print_help()
+        sys.exit(1)
+
+    if lang not in ('chn_eng', 'eng', 'jap', 'kor'):
+        print 'unknown language type: %s' % lang
+        parser.print_help()
+        sys.exit(1)
+
+    if api_type not in ('test', 'online'):
+        print 'unknown api type: %s' % api_type
+        parser.print_help()
         sys.exit(1)
 
     try:
-        api_key = open('~/.bocr_key').read().strip()
-        ocr = BaiduOcr(apikey=api_key)
+        api_key = open(KEY_FILE, 'r').read().strip()
     except IOError as e:
-        print 'No API key found in %s' % abspath(join(getenv('HOME'), '.bocr_key'))
+        print 'Error: No API key found in %s' % abspath(join(getenv('HOME'), '.bocr_key'))
         sys.exit(1)
 
-    res = ocr.recog(sys.argv[1])
-    print res.get(u'retData')[0].get(u'word')
-    # except Exception as e:
-        # print e
+    client = BaiduOcr(api_key, api_type)
+    res = client.recog(image_file, service=service, lang=lang.upper())
 
+    if res and res.get(u'errNum') != u'0':
+        print 'Error: ', res.get(u'errMsg', 'no error message')
+
+    else:
+        ret_data = res.get(u'retData', [])
+        if len(ret_data) == 0:
+            pass
+        elif service in ('LocateRecognize', 'Recognize'):
+            print ret_data[0].get(u'word', '')
+        elif service == 'Locate':
+            for rect in ret_data:
+                print rect['rect']['left'], rect['rect']['width'], \
+                    rect['rect']['top'], rect['rect']['height']
+        elif service == 'SingleCharRecognize':
+            word_probs = [(w['word'], float(w['prob'])) for w in ret_data]
+            max_prob_word = sorted(word_probs, key=itemgetter(1), reverse=True)[0]
+            print max_prob_word[0]
