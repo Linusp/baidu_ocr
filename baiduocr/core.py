@@ -49,7 +49,7 @@ class BaiduOcr(object):
         res = resp.json() if resp is not None else {}
 
         if res.get(u'errNum', -1) == u'0' and res.get(u'errMsg', '') == u'success':
-            print 'pong'
+            print('pong')
 
         return res
 
