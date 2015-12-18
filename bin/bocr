@@ -27,15 +27,12 @@ if __name__ == '__main__':
                         help='choose service from LocateRecognize(0), Recognize(1, default), Locate(2), SingleCharRecognize(3)')
     parser.add_argument('-l', '--lang', type=str,
                         help='specify language of text to be detected, chn_eng(default), eng, jap or kor')
-    parser.add_argument('-t', '--type', type=str,
-                        help='set the api type, online or test(default)')
 
     args = parser.parse_args()
 
     image_file = args.input
     service = SERVICE_LIST.get(1 if not args.service else args.service, None)
     lang = 'chn_eng' if not args.lang else args.lang
-    api_type = 'test' if not args.type else args.type
 
     # 参数检查
     if not image_file:
@@ -53,18 +50,13 @@ if __name__ == '__main__':
         parser.print_help()
         sys.exit(1)
 
-    if api_type not in ('test', 'online'):
-        print 'unknown api type: %s' % api_type
-        parser.print_help()
-        sys.exit(1)
-
     try:
         api_key = open(KEY_FILE, 'r').read().strip()
     except IOError as e:
         print 'Error: No API key found in %s' % abspath(join(getenv('HOME'), '.bocr_key'))
         sys.exit(1)
 
-    client = BaiduOcr(api_key, api_type)
+    client = BaiduOcr(key=api_key)
     res = client.recog(image_file, service=service, lang=lang.upper())
 
     if res and res.get(u'errNum') != u'0':

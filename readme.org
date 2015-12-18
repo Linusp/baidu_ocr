@@ -8,9 +8,11 @@
 
    + 个人免费版
 
-     API 详情地址: http://apistore.baidu.com/apiworks/servicedetail/146.html
+     +API 详情地址: http://apistore.baidu.com/apiworks/servicedetail/146.html+
 
-     限制: 5000次/天，每秒查询次数(Query Per Second, QPS)有限制
+     +限制: 5000次/天，每秒查询次数(Query Per Second, QPS)有限制+
+
+     <2015-12-18 五>: 个人免费版服务已下线
 
    + 企业版
 
@@ -23,7 +25,7 @@
 
    + 接口地址:
 
-     免费版: http://apis.baidu.com/apistore/idlocr/ocr
+     +免费版: http://apis.baidu.com/apistore/idlocr/ocr+
 
      企业版: http://apis.baidu.com/idl_baidu/baiduocrpay/idlocrpaid
 
@@ -140,8 +142,9 @@
    #+BEGIN_SRC python
    from baiduocr import BaiduOcr
 
+   API_URL = 'http://apis.baidu.com/idl_baidu/baiduocrpay/idlocrpaid'
    API_KEY = 'your api key'
-   client = BaiduOcr(API_KEY, 'test')  # 使用个人免费版 API，企业版替换为 'online'
+   client = BaiduOcr(url=API_URL, key=API_KEY)
 
    # client.ping()
    res = client.recog('http://lyj.fj61.net/upload/2011-11/11110912327265.jpg',

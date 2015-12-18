@@ -2,7 +2,7 @@
 
 from setuptools import setup, find_packages
 
-VERSION='20150821'
+VERSION='20151218'
 
 setup(
     name='baiduocr',
