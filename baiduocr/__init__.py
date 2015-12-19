@@ -1,6 +1,4 @@
-from sys import version_info
+# coding: utf-8
 
-if version_info[0] == 3:
-    from .core import BaiduOcr
-else:
-    from core import BaiduOcr
+from __future__ import absolute_import
+from baiduocr.core import BaiduOcr

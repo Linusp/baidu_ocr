@@ -1,9 +1,21 @@
 # -*- coding: utf-8 -*-
 
+from __future__ import absolute_import
 import requests
 
+from baiduocr.result import (
+    LocateRecognizeResult,
+    SingleCharResult,
+)
 
-API_URL = 'http://apis.baidu.com/idl_baidu/baiduocrpay/idlocrpaid'
+
+_API_URL = 'http://apis.baidu.com/idl_baidu/baiduocrpay/idlocrpaid'
+_SERVICE_RESULT_MAP = {
+    'Recognize': LocateRecognizeResult,
+    'LocateRecognize': LocateRecognizeResult,
+    'Locate': LocateRecognizeResult,
+    'SingleCharRecognize': SingleCharResult,
+}
 
 
 class BaiduOcr(object):
@@ -15,7 +27,7 @@ class BaiduOcr(object):
     _SERVICE_LIST = set(['LocateRecognize', 'Locate', 'Recognize', 'SingleCharRecognize'])
     _LANG_LIST = set(['CHN_ENG', 'ENG', 'JAP', 'KOR'])
 
-    def __init__(self, url=API_URL, key=''):
+    def __init__(self, url=_API_URL, key=''):
         """初始化客户端
 
         :type api_key: str
@@ -45,8 +57,9 @@ class BaiduOcr(object):
 
         resp = requests.post(self.url, headers=header, data=data)
         res = resp.json() if resp is not None else {}
+        res = _SERVICE_RESULT_MAP['Recognize'](res)
 
-        if res.get(u'errNum', -1) == u'0' and res.get(u'errMsg', '') == u'success':
+        if res.status == 0 and res.message == u'success':
             print('pong')
 
         return res
@@ -72,12 +85,13 @@ class BaiduOcr(object):
                      + JAP: 日文
                      + KOR: 韩文
 
-        返回结果是一个 dict 类型的值，包含以下几个字段
-        + errNum: 结果状态，类型为 unicode, 为 0 时表示有结果且正常；否则表示出错
-        + errMsg: 错误消息，类型为 unicode
-        + querySign: 本次请求的唯一性标识(无用)
-        + retData: 实际结果，类型为 list
+        返回结果是一个 Result 类型，见 result.py
         """
+        if service not in self._SERVICE_LIST:
+            raise ValueError('wrong service type')
+        if lang not in self._LANG_LIST:
+            raise ValueError('unsupported language')
+
         header = {'apikey': self.api_key}
         data = {}
         data['fromdevice'] = 'pc'
@@ -89,13 +103,14 @@ class BaiduOcr(object):
         image_file = None
         try:
             if image.startswith('http://') or image.startswith('https://'):
-                r = requests.get(image)
-                image_file = r.content
+                req = requests.get(image)
+                image_file = req.content
             else:
                 image_file = open(image, 'rb')
         except Exception:
             return {}
 
         resp = requests.post(self.url, headers=header, data=data, files={'image': ('ocr.jpg', image_file)})
+        resp = {} if not resp else resp.json()
 
-        return {} if not resp else resp.json()
+        return _SERVICE_RESULT_MAP[service](resp)

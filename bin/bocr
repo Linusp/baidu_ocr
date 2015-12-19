@@ -59,20 +59,14 @@ if __name__ == '__main__':
     client = BaiduOcr(key=api_key)
     res = client.recog(image_file, service=service, lang=lang.upper())
 
-    if res and res.get(u'errNum') != u'0':
-        print 'Error: ', res.get(u'errMsg', 'no error message')
+    if res.status != 0:
+        print 'Error: ', res.message
 
     else:
-        ret_data = res.get(u'retData', [])
-        if len(ret_data) == 0:
-            pass
-        elif service in ('LocateRecognize', 'Recognize'):
-            print ret_data[0].get(u'word', '')
+        if service in ('LocateRecognize', 'Recognize'):
+            print res.get_result_text()
         elif service == 'Locate':
-            for rect in ret_data:
-                print rect['rect']['left'], rect['rect']['width'], \
-                    rect['rect']['top'], rect['rect']['height']
+            for rect in res.get_result_regions():
+                print rect.left, rect.width, rect.top, rect.height
         elif service == 'SingleCharRecognize':
-            word_probs = [(w['word'], float(w['prob'])) for w in ret_data]
-            max_prob_word = sorted(word_probs, key=itemgetter(1), reverse=True)[0]
-            print max_prob_word[0]
+            print res.get_char()
