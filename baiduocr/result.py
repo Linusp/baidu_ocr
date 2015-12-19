@@ -42,7 +42,7 @@ class LocateRecognizeResult(Result):
         self.result = [
             (row.get(u'word', u''), Rect(**row.get(u'rect')))
             for row in self.result
-        ]
+        ] if self.result else []
 
     def get_result_text(self):
         """获取识别文本"""
@@ -72,7 +72,7 @@ class SingleCharResult(Result):
         self.result = [
             (row.get(u'word'), float(row.get(u'prob')))
             for row in self.result
-        ]
+        ] if self.result else []
         self.result = sorted(self.result, key=itemgetter(1), reverse=True)
         self.threshold = 0.50
 
