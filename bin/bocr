@@ -1,5 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+
+from __future__ import print_function
+
 import sys
 import argparse
 from os import getenv
@@ -41,32 +44,32 @@ if __name__ == '__main__':
         sys.exit(1)
 
     if not service:
-        print 'invalid service'
+        print('invalid service')
         parser.print_help()
         sys.exit(1)
 
     if lang not in ('chn_eng', 'eng', 'jap', 'kor'):
-        print 'unknown language type: %s' % lang
+        print('unknown language type: %s' % lang)
         parser.print_help()
         sys.exit(1)
 
     try:
         api_key = open(KEY_FILE, 'r').read().strip()
     except IOError as e:
-        print 'Error: No API key found in %s' % abspath(join(getenv('HOME'), '.bocr_key'))
+        print('Error: No API key found in %s' % abspath(join(getenv('HOME'), '.bocr_key')))
         sys.exit(1)
 
     client = BaiduOcr(key=api_key)
     res = client.recog(image_file, service=service, lang=lang.upper())
 
     if res.status != 0:
-        print 'Error: ', res.message
+        print('Error:', res.status, res.message)
 
     else:
         if service in ('LocateRecognize', 'Recognize'):
-            print res.get_result_text()
+            print(res.get_result_text())
         elif service == 'Locate':
             for rect in res.get_result_regions():
-                print rect.left, rect.width, rect.top, rect.height
+                print(rect.left, rect.width, rect.top, rect.height)
         elif service == 'SingleCharRecognize':
-            print res.get_char()
+            print(res.get_char())
