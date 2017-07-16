@@ -7,7 +7,6 @@ import sys
 import argparse
 from os import getenv
 from os.path import join, abspath
-from operator import itemgetter
 
 from baiduocr import BaiduOcr
 
@@ -22,24 +21,18 @@ SERVICE_LIST = {
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Recognize text from picuture.')
-    parser.add_argument('-i', '--input', type=str,
+    parser.add_argument('-i', '--input', type=str, required=True,
                         help='specify picture want to recognize')
-    parser.add_argument('-s', '--service', type=int,
-                        help='choose service from LocateRecognize(0), Recognize(1, default), Locate(2), SingleCharRecognize(3)')
-    parser.add_argument('-l', '--lang', type=str,
-                        help='specify language of text to be detected, chn_eng(default), eng, jap or kor')
+    parser.add_argument('-s', '--service', type=str, default='locate_recog',
+                        help='choose service from: locate_recog(default), locate')
+    parser.add_argument('-l', '--lang', type=str, default='chn_eng',
+                        help='language of text to be detected, chn_eng(default), eng, jap or kor')
 
     args = parser.parse_args()
 
     image_file = args.input
-    service = SERVICE_LIST.get(1 if not args.service else args.service, None)
+    service = SERVICE_LIST.get(args.service)
     lang = 'chn_eng' if not args.lang else args.lang
-
-    # 参数检查
-    if not image_file:
-        print 'no image file is given.'
-        parser.print_help()
-        sys.exit(1)
 
     if not service:
         print('invalid service')
