@@ -15,10 +15,8 @@ from baiduocr import BaiduOcr
 KEY_FILE = join(getenv('HOME'), '.bocr_key')
 
 SERVICE_LIST = {
-    0: 'LocateRecognize',
-    1: 'Recognize',
-    2: 'Locate',
-    3: 'SingleCharRecognize',
+    'locate_recog': 'LocateRecognize',
+    'locate': 'Locate',
 }
 
 
@@ -66,10 +64,8 @@ if __name__ == '__main__':
         print('Error:', res.status, res.message)
 
     else:
-        if service in ('LocateRecognize', 'Recognize'):
+        if service == 'LocateRecognize':
             print(res.get_result_text())
         elif service == 'Locate':
             for rect in res.get_result_regions():
                 print(rect.left, rect.width, rect.top, rect.height)
-        elif service == 'SingleCharRecognize':
-            print(res.get_char())
